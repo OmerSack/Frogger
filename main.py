@@ -4,6 +4,7 @@ from car import Car
 from player import Player
 from time import time, sleep
 from random import choice
+from math import floor
 
 win = pygame.display.set_mode((1000, 720))
 
@@ -30,6 +31,14 @@ yellow_car = pygame.transform.scale(yellow_car, (yellow_car.get_width() * scale,
 no_roof_car = pygame.image.load("assets/no_roof_car.png")
 no_roof_car = pygame.transform.scale(no_roof_car, (no_roof_car.get_width() * scale, no_roof_car.get_height() * scale))
 cars = []
+
+for i in range(len(road_list)):
+    space_between_cars = road_list[i].timing * road_list[i].line_speed * 120
+    cars_in_road = floor(win.get_width() / space_between_cars)
+    for j in range(cars_in_road):
+        if i % 2 == 1: car = Car(choice([blue_car, red_car, yellow_car, no_roof_car]), [space_between_cars * (j+1), road_list[i].y], road_list[i].line_speed, "right")
+        else: car = Car(choice([blue_car, red_car, yellow_car, no_roof_car]), [win.get_width() - space_between_cars * (j+1), road_list[i].y], road_list[i].line_speed, "left")
+        cars.append(car)
 
 player = Player(frog, [win.get_width() / 2 - frog.get_width() / 2, win.get_height() - frog.get_width()], "up")
 
@@ -68,7 +77,7 @@ def main():
                 if direction == "left": car = Car(choice([blue_car, red_car, yellow_car, no_roof_car]), [win.get_width(), road_list[i].y], road_list[i].line_speed, direction)
                 cars.append(car)
                 road_list[i].last_time = time()
-        
+
         for car in cars:        
             if car.pos[0] < 0 - car.texture.get_width() or car.pos[0] > win.get_width():
                 cars.remove(car)
@@ -84,7 +93,8 @@ def main():
 
         for car in cars:
                 win.blit(car.texture, (car.pos[0], car.pos[1]))
-
+        
+        
         win.blit(player.texture, (player.pos[0], player.pos[1])) 
         pygame.display.update()
 
