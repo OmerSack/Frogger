@@ -36,8 +36,12 @@ player = Player(frog, [win.get_width() / 2 - frog.get_width() / 2, win.get_heigh
 def main():
     run = True
     last_time = time()
+    clock = pygame.time.Clock()
     while run:
         win.fill("#00539C")
+
+        delta_time = clock.tick(100) / 1000
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -51,8 +55,9 @@ def main():
                 player.texture = pygame.transform.rotate(frog, -90)
             if player.direction == "left":
                 player.texture = pygame.transform.rotate(frog, 90)
+
         keys = pygame.key.get_pressed()
-        last_time = movement(keys, last_time)
+        last_time = movement(keys, last_time, delta_time)
         player.update()
 
         for i in range(len(road_list)):
@@ -68,7 +73,7 @@ def main():
             if car.pos[0] < 0 - car.texture.get_width() or car.pos[0] > win.get_width():
                 cars.remove(car)
             else:
-                car.pos[0] -= car.speed
+                car.pos[0] -= car.speed * 120 * delta_time
                 car.update()
                 if car.hitbox.colliderect(player.hitbox):
                     game_over()
@@ -83,7 +88,7 @@ def main():
         win.blit(player.texture, (player.pos[0], player.pos[1])) 
         pygame.display.update()
 
-def movement(keys, last_time):
+def movement(keys, last_time, delta_time):
     if (keys[pygame.K_w] or keys[pygame.K_UP]) and time() - last_time > 0.2 and player.pos[1] > road.get_height():
         player.pos[1] -= road.get_height()
         player.texture = frog_attracting
@@ -95,10 +100,10 @@ def movement(keys, last_time):
         player.direction = "down"
         last_time = time()
     if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and player.pos[0] < win.get_width() - player.texture.get_width():
-        player.pos[0] += 2.5
+        player.pos[0] += 300 * delta_time
         player.direction = "right"
     if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and player.pos[0] > 0:
-        player.pos[0] -= 2.5
+        player.pos[0] -= 300 * delta_time
         player.direction = "left"
 
     return last_time
